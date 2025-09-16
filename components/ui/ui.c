@@ -1,5 +1,5 @@
 #include "ui.h"
-#include "lvgl/lvgl.h"
+#include "lvgl.h"
 
 #include "screens.h"
 

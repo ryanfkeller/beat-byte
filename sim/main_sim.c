@@ -1,9 +1,9 @@
 #include <stdint.h>
 #include <unistd.h>
 
-#include "lvgl/lvgl.h"
+#include "lvgl.h"
 #include "hal/hal.h"
-#include "ui/ui.h"
+#include "ui.h"
 
 
 int main(int argc, char **argv) {

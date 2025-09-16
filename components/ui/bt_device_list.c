@@ -1,6 +1,6 @@
 #include "bt_device_list.h"
 
-#include "lvgl/lvgl.h"
+#include "lvgl.h"
 
 /**********************
  *  STATIC PROTOTYPES
@@ -36,9 +36,9 @@ static const char *bt_devices[] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
- lv_obj_t *lv_bt_device_list_create(lv_obj_t *parent) {
+ void lv_bt_device_list_create(lv_obj_t *parent) {
     font_small = &lv_font_montserrat_14;
-    font_medium = &lv_font_montserrat_22;
+    font_medium = &lv_font_montserrat_14;
     uint32_t id = 0;
     while (true)
     {

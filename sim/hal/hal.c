@@ -1,6 +1,6 @@
 #include "hal.h"
 
-#include "lvgl/lvgl.h"
+#include "lvgl.h"
 
 lv_display_t * sdl_hal_init(int32_t w, int32_t h) {
     lv_group_set_default(lv_group_create());

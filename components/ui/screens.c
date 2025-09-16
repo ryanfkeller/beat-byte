@@ -1,5 +1,5 @@
 #include "screens.h"
-#include "lvgl/lvgl.h"
+#include "lvgl.h"
 #include "bt_device_list.h"
 
 
