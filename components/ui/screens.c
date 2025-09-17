@@ -2,6 +2,8 @@
 #include "lvgl.h"
 #include "bt_device_list.h"
 
+#include "bluetooth.h"
+
 
 struct Screens screens;
 
@@ -20,6 +22,11 @@ static lv_obj_t *create_switch(lv_obj_t *parent, const char *icon, const char *t
 static lv_obj_t *create_subpage(lv_obj_t *menu, lv_obj_t *parent, lv_obj_t *child, const char* txt);
 static lv_obj_t *create_menu_label(lv_obj_t *page, const char *txt);
 static lv_obj_t *create_menu_switch(lv_obj_t * parent, const char * txt, bool chk);
+
+static void bt_switch_event_handler(lv_event_t *e) {
+    get_available_bt_devices();
+}
+
 
 static void create_menu_screen() {
     screens.menu = lv_obj_create(NULL);
@@ -56,9 +63,6 @@ static void create_menu_screen() {
 
 
 
-
-    
-
     // // Create our initial list of paired bluetooth devices
     // create_menu_label(bluetooth_page, "Connected Devices");
     // lv_obj_t *section = lv_menu_section_create(bluetooth_page);
@@ -91,7 +95,9 @@ static lv_obj_t *create_subpage(lv_obj_t *menu, lv_obj_t *parent, lv_obj_t *chil
 }
 
 static lv_obj_t *create_menu_label(lv_obj_t *page, const char *txt) {
+    lv_group_t *group = lv_group_get_default();
     lv_obj_t *obj = lv_menu_cont_create(page);
+    lv_group_add_obj(group, obj);
     lv_obj_t *label = lv_label_create(obj);
     lv_label_set_text(label, txt);
     return obj;
@@ -115,7 +121,9 @@ void create_screens() {
 static lv_obj_t *create_text(lv_obj_t * parent, const char * icon, const char * txt,
                                         lv_menu_builder_variant_t builder_variant)
 {
+    lv_group_t *group = lv_group_get_default();
     lv_obj_t *obj = lv_menu_cont_create(parent);
+    lv_group_add_obj(group, obj);
 
     lv_obj_t *img = NULL;
     lv_obj_t *label = NULL;
@@ -162,6 +170,7 @@ static lv_obj_t *create_switch(lv_obj_t *parent, const char *icon, const char *t
 
     lv_obj_t *sw = lv_switch_create(obj);
     lv_obj_add_state(sw, chk ? LV_STATE_CHECKED : 0);
+    lv_obj_add_event_cb(sw, bt_switch_event_handler, LV_EVENT_PRESSED, NULL);
 
     return obj;
 }

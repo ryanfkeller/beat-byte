@@ -78,6 +78,10 @@
 #define UART_RX_BUF_SIZE 256
 #define UART_TX_BUF_SIZE 0
 
+/*********************************************************************
+ * USB DEFINES
+ *********************************************************************/
+
 
 /*********************************************************************
  * STATIC VARIABLES
@@ -316,7 +320,18 @@ void app_main(void)
     ESP_LOGI(TAG, "Create LVGL task");
     xTaskCreate(lvgl_port_task, "LVGL", LVGL_TASK_STACK_SIZE, NULL, LVGL_TASK_PRIORITY, NULL);
 
+    lv_group_t *group = lv_group_create();
+    lv_group_set_default(group);
+
+    lv_indev_t *uart_indev = lv_indev_create();
+    lv_indev_set_type(uart_indev, LV_INDEV_TYPE_KEYPAD);
+    lv_indev_set_read_cb(uart_indev, uart_indev_read_cb);
+    lv_indev_set_group(uart_indev, group);
+    lv_indev_enable(uart_indev, true);
+
     create_ui();
+    
+
 
 
     ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(panel_handle, true));
