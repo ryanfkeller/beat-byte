@@ -1,30 +1,38 @@
 #include "screens.h"
 #include "lvgl.h"
-#include "bt_device_list.h"
-
 #include "bluetooth.h"
+#include "esp_log.h"
+
+#define TAG "screens"
 
 
 struct Screens screens;
 
-enum {
-    LV_MENU_ITEM_BUILDER_VARIANT_1,
-    LV_MENU_ITEM_BUILDER_VARIANT_2
-};
-typedef uint8_t lv_menu_builder_variant_t;
 
-static void switch_handler(lv_event_t * e);
-static lv_obj_t *create_text(lv_obj_t *parent, const char *icon, const char *txt, lv_menu_builder_variant_t builder_variant);
-static lv_obj_t *create_slider(lv_obj_t *parent, const char *icon, const char *txt, int32_t min, int32_t max, int32_t val);
-static lv_obj_t *create_switch(lv_obj_t *parent, const char *icon, const char *txt, bool chk);
+static lv_obj_t *create_menu_switch(lv_obj_t *page, const char *txt, void (*cb_func)(lv_event_t*), bool chk);
+static lv_obj_t *create_menu_item(lv_obj_t *page, const char *icon, const char *txt, bool selectable);
 
-
-static lv_obj_t *create_subpage(lv_obj_t *menu, lv_obj_t *parent, lv_obj_t *child, const char* txt);
-static lv_obj_t *create_menu_label(lv_obj_t *page, const char *txt);
-static lv_obj_t *create_menu_switch(lv_obj_t * parent, const char * txt, bool chk);
+static lv_group_t *group;
+static lv_display_t *disp;
 
 static void bt_switch_event_handler(lv_event_t *e) {
-    get_available_bt_devices();
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t *obj = lv_event_get_target_obj(e);
+    
+    if(code == LV_EVENT_VALUE_CHANGED) {
+        // LV_UNUSED(obj);
+        // ESP_LOGI(TAG, "State: %s\n", lv_obj_has_state(obj, LV_STATE_CHECKED) ? "On" : "Off");
+        if (lv_obj_has_state(obj, LV_STATE_CHECKED)) {
+        //bt_init();
+            ESP_LOGI(TAG, "Enabling bluetooth");
+            bt_enable(true);
+        }
+        else {
+            ESP_LOGI(TAG, "Disabling bluetooth");
+            bt_enable(false);
+        }
+    }
+    
 }
 
 
@@ -49,128 +57,72 @@ static void create_menu_screen() {
     lv_obj_t *bluetooth_page = lv_menu_page_create(menu, "Bluetooth");
     lv_obj_set_style_pad_hor(bluetooth_page, lv_obj_get_style_pad_left(lv_menu_get_main_header(menu), 0),0);
     section = lv_menu_section_create(bluetooth_page);
-    create_switch(section, NULL, "Enable Bluetooth", false);
+    create_menu_switch(section, "Enable Bluetooth", bt_switch_event_handler, false);
     lv_menu_separator_create(bluetooth_page);
-    create_text(bluetooth_page, NULL, "My Devices", LV_MENU_ITEM_BUILDER_VARIANT_1);
+    create_menu_item(bluetooth_page, NULL, "My Devices", false);
     section = lv_menu_section_create(bluetooth_page);
-    create_text(section, NULL, "Test1", LV_MENU_ITEM_BUILDER_VARIANT_1);
-    create_text(section, NULL, "Test2", LV_MENU_ITEM_BUILDER_VARIANT_1);
+
+    create_menu_item(section, NULL, "Test1", true);
+    create_menu_item(section, NULL, "Test2", true);
+
     lv_menu_separator_create(bluetooth_page);
-    create_text(bluetooth_page, NULL, "Other Devices", LV_MENU_ITEM_BUILDER_VARIANT_1);
+
+    create_menu_item(bluetooth_page, NULL, "Other Devices", false);
     section = lv_menu_section_create(bluetooth_page);
-    create_text(section, NULL, "Test3", LV_MENU_ITEM_BUILDER_VARIANT_1);
-    create_text(section, NULL, "Test4", LV_MENU_ITEM_BUILDER_VARIANT_1);
+    create_menu_item(section, NULL, "Test3", true);
+    create_menu_item(section, NULL, "Test4", true);
 
-
-
-    // // Create our initial list of paired bluetooth devices
-    // create_menu_label(bluetooth_page, "Connected Devices");
-    // lv_obj_t *section = lv_menu_section_create(bluetooth_page);
-    // lv_bt_device_list_create(section);
 
     lv_obj_t *root_page = lv_menu_page_create(menu, NULL);
     lv_obj_set_style_pad_hor(root_page, lv_obj_get_style_pad_left(lv_menu_get_main_header(menu), 0), 0);
     section = lv_menu_section_create(root_page);
-    cont = create_text(section, LV_SYMBOL_SETTINGS, "Bluetooth", LV_MENU_ITEM_BUILDER_VARIANT_1);
+    cont = create_menu_item(section, LV_SYMBOL_SETTINGS, "Bluetooth", true);
     lv_menu_set_load_page_event(menu, cont, bluetooth_page);
-
-    // cont = lv_menu_cont_create(main_page);
-    // label = lv_label_create(cont);
-    // lv_label_set_text(label, "Files");
-    // lv_menu_set_load_page_event(menu, cont, files_page);
-
-    // // Populate the library page
-    // cont = lv_menu_cont_create(library_page);
-    // label = lv_label_create(cont);
-    // lv_label_set_text(label, "Artists");
 
 
     lv_menu_set_page(menu, root_page);
 }
 
-static lv_obj_t *create_subpage(lv_obj_t *menu, lv_obj_t *parent, lv_obj_t *child, const char *txt) {
-    lv_obj_t *obj = create_menu_label(parent, txt);
-    lv_menu_set_load_page_event(menu, obj, child);
-    return obj;
-}
-
-static lv_obj_t *create_menu_label(lv_obj_t *page, const char *txt) {
-    lv_group_t *group = lv_group_get_default();
-    lv_obj_t *obj = lv_menu_cont_create(page);
-    lv_group_add_obj(group, obj);
-    lv_obj_t *label = lv_label_create(obj);
-    lv_label_set_text(label, txt);
-    return obj;
-}
-
-static lv_obj_t *create_menu_switch(lv_obj_t * parent, const char * txt, bool chk)
-{
-    lv_obj_t *obj = create_menu_label(parent, txt);
-    lv_obj_t *sw = lv_switch_create(obj);
-    lv_obj_add_state(sw, chk ? LV_STATE_CHECKED : LV_STATE_DEFAULT);
-    return obj;
-}
 
 void create_screens() {
-    lv_disp_t *disp = lv_disp_get_default();
+    group = lv_group_get_default();
+    disp = lv_disp_get_default();
     create_menu_screen();
 }
 
-
-// Ripped straight from an LVGL example
-static lv_obj_t *create_text(lv_obj_t * parent, const char * icon, const char * txt,
-                                        lv_menu_builder_variant_t builder_variant)
-{
-    lv_group_t *group = lv_group_get_default();
-    lv_obj_t *obj = lv_menu_cont_create(parent);
-    lv_group_add_obj(group, obj);
-
+static lv_obj_t *create_menu_item(lv_obj_t *page, const char *icon, const char *txt, bool selectable) {
+    lv_obj_t *obj = lv_menu_cont_create(page);
     lv_obj_t *img = NULL;
     lv_obj_t *label = NULL;
 
-    if(icon) {
+    if (icon) {
         img = lv_img_create(obj);
         lv_img_set_src(img, icon);
     }
 
-    if(txt) {
+    if (txt) {
         label = lv_label_create(obj);
         lv_label_set_text(label, txt);
-        lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+        lv_label_set_long_mode(label, LV_LABEL_LONG_MODE_SCROLL_CIRCULAR);
         lv_obj_set_flex_grow(label, 1);
     }
 
-    if(builder_variant == LV_MENU_ITEM_BUILDER_VARIANT_2 && icon && txt) {
-        lv_obj_add_flag(img, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-        lv_obj_swap(img, label);
+    if (selectable) {
+        lv_group_add_obj(group, obj);
     }
 
     return obj;
 }
 
-static lv_obj_t *create_slider(lv_obj_t * parent, const char * icon, const char * txt, int32_t min, int32_t max, int32_t val)
+static lv_obj_t *create_menu_switch(lv_obj_t *page, const char *txt, void (*cb_func)(lv_event_t*), bool default_checked)
 {
-    lv_obj_t *obj = create_text(parent, icon, txt, LV_MENU_ITEM_BUILDER_VARIANT_2);
-
-    lv_obj_t *slider = lv_slider_create(obj);
-    lv_obj_set_flex_grow(slider, 1);
-    lv_slider_set_range(slider, min, max);
-    lv_slider_set_value(slider, val, LV_ANIM_OFF);
-
-    if(icon == NULL) {
-        lv_obj_add_flag(slider, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-    }
-
-    return obj;
-}
-
-static lv_obj_t *create_switch(lv_obj_t *parent, const char *icon, const char *txt, bool chk)
-{
-    lv_obj_t *obj = create_text(parent, icon, txt, LV_MENU_ITEM_BUILDER_VARIANT_1);
-
+    lv_obj_t *obj = create_menu_item(page, NULL, txt, false);
     lv_obj_t *sw = lv_switch_create(obj);
-    lv_obj_add_state(sw, chk ? LV_STATE_CHECKED : 0);
-    lv_obj_add_event_cb(sw, bt_switch_event_handler, LV_EVENT_PRESSED, NULL);
+    lv_obj_add_state(sw, default_checked ? LV_STATE_CHECKED : LV_STATE_DEFAULT);
+    lv_group_add_obj(group, sw);
 
+    if (cb_func) {
+        lv_obj_add_event_cb(sw, cb_func, LV_EVENT_ALL, NULL);
+    }
     return obj;
 }

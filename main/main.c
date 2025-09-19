@@ -34,12 +34,12 @@
 #define LCD_BK_LIGHT_ON_LVL     1
 #define LCD_BK_LIGHT_OFF_LVL    !LCD_BK_LIGHT_ON_LVL
 
-#define LCD_PIN_NUM_SCLK        2
-#define LCD_PIN_NUM_MOSI        1
-#define LCD_PIN_NUM_DC          41
-#define LCD_PIN_NUM_RST         40
-#define LCD_PIN_NUM_CS          42
-#define LCD_PIN_NUM_BK_LIGHT    39
+#define LCD_PIN_NUM_SCLK        18
+#define LCD_PIN_NUM_MOSI        19
+#define LCD_PIN_NUM_DC          17
+#define LCD_PIN_NUM_RST         16
+#define LCD_PIN_NUM_CS          5
+#define LCD_PIN_NUM_BK_LIGHT    4
 
 #define LCD_TRANS_QUEUE_DEPTH   10
 

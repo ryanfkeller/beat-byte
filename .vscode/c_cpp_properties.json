@@ -4,7 +4,8 @@
             "name": "LVGL Sim",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/components/ui"
+                "${workspaceFolder}/components/ui",
+                "~/esp/esp-idf/**/*"
             ],
             "intelliSenseMode": "linux-gcc-x64",
             "compilerPath": "/usr/bin/gcc",

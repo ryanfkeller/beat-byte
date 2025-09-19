@@ -1,3 +1,5 @@
 #pragma once
+#include <stdbool.h>
 
-void get_available_bt_devices(void);
+void bt_init(void);
+void bt_enable(bool enable);

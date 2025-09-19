@@ -9,5 +9,6 @@
         "lvgl.h": "c",
         "unistd.h": "c",
         "bt_device_list.h": "c"
-    }
+    },
+    "cSpell.enabled": false
 }
