@@ -32,8 +32,48 @@ static void bt_switch_event_handler(lv_event_t *e) {
             bt_enable(false);
         }
     }
-    
 }
+
+// static void file_explorer_event_handler(lv_event_t *e) {
+//     lv_event_code_t code = lv_event_get_code(e);
+//     lv_obj_t *obj = lv_event_get_target_obj(e);
+
+//     if (code == LV_EVENT_VALUE_CHANGED) {
+//         const char *cur_path = lv_file_explorer_get_current_path(obj);
+//         const char *sel_fn = lv_file_explorer_get_selected_file_name(obj);
+//         LV_LOG_USER("%s%s", cur_path, sel_fn);
+//     }
+// }
+
+// static void lv_fs_read_file(char *fn) {
+//     lv_fs_file_t f;
+//     lv_fs_res_t res;
+
+//     res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
+
+//     if(res != LV_FS_RES_OK) {
+// 		LV_LOG_USER("Open error! Error code: %d", res);
+// 		return;
+// 	}
+
+//     uint32_t read_num;
+// 	uint8_t buf[8];
+
+//     while (1) {
+// 		res = lv_fs_read(&f, buf, 8, &read_num);
+// 		if(res != LV_FS_RES_OK) {
+// 			LV_LOG_USER("Read error! Error code: %d", res);
+// 			break;
+// 		}
+
+// 		//printf("%s", buf);
+//                 LV_LOG_USER("%s", buf);
+
+// 		if (read_num != 8)	break;
+// 	}
+//     lv_fs_close(&f);
+
+// }
 
 
 static void create_menu_screen() {
@@ -41,11 +81,11 @@ static void create_menu_screen() {
     lv_obj_set_size(screens.menu, 240, 320);
 
     lv_obj_t *menu = lv_menu_create(screens.menu);
-    lv_color_t bg_color = lv_obj_get_style_bg_color(menu, 0);
+    lv_color_t bg_color = lv_obj_get_style_bg_color(menu, (lv_part_t)0);
     if(lv_color_brightness(bg_color) > 127) {
-        lv_obj_set_style_bg_color(menu, lv_color_darken(lv_obj_get_style_bg_color(menu, 0), 10), 0);
+        lv_obj_set_style_bg_color(menu, lv_color_darken(lv_obj_get_style_bg_color(menu, (lv_part_t)0), 10), 0);
     }else{
-        lv_obj_set_style_bg_color(menu, lv_color_darken(lv_obj_get_style_bg_color(menu, 0), 50), 0);
+        lv_obj_set_style_bg_color(menu, lv_color_darken(lv_obj_get_style_bg_color(menu, (lv_part_t)0), 50), 0);
     }
     lv_obj_set_size(menu, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
     lv_obj_center(menu);
@@ -55,7 +95,7 @@ static void create_menu_screen() {
 
     // Create sub-pages
     lv_obj_t *bluetooth_page = lv_menu_page_create(menu, "Bluetooth");
-    lv_obj_set_style_pad_hor(bluetooth_page, lv_obj_get_style_pad_left(lv_menu_get_main_header(menu), 0),0);
+    lv_obj_set_style_pad_hor(bluetooth_page, lv_obj_get_style_pad_left(lv_menu_get_main_header(menu), (lv_part_t)0),0);
     section = lv_menu_section_create(bluetooth_page);
     create_menu_switch(section, "Enable Bluetooth", bt_switch_event_handler, false);
     lv_menu_separator_create(bluetooth_page);
@@ -74,13 +114,18 @@ static void create_menu_screen() {
 
 
     lv_obj_t *root_page = lv_menu_page_create(menu, NULL);
-    lv_obj_set_style_pad_hor(root_page, lv_obj_get_style_pad_left(lv_menu_get_main_header(menu), 0), 0);
+    lv_obj_set_style_pad_hor(root_page, lv_obj_get_style_pad_left(lv_menu_get_main_header(menu), (lv_part_t)0), 0);
     section = lv_menu_section_create(root_page);
     cont = create_menu_item(section, LV_SYMBOL_SETTINGS, "Bluetooth", true);
     lv_menu_set_load_page_event(menu, cont, bluetooth_page);
 
-
     lv_menu_set_page(menu, root_page);
+
+    // File explorer stuff
+    // lv_obj_t *file_explorer = lv_file_explorer_create(screens.menu);
+    // lv_file_explorer_set_sort(file_explorer, LV_EXPLORER_SORT_KIND);
+    // lv_file_explorer_open_dir(file_explorer, "A:/");
+
 }
 
 

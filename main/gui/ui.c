@@ -5,6 +5,5 @@
 
 void create_ui(void) {
     create_screens();
-
     lv_screen_load(screens.menu);
 }
