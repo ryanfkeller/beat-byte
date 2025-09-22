@@ -1,0 +1,30 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.json.liquid": "json",
+			"*.yaml.liquid": "yaml",
+			"*.md.liquid": "markdown",
+			"*.js.liquid": "liquid-javascript",
+			"*.css.liquid": "liquid-css",
+			"*.scss.liquid": "liquid-scss",
+			"lvgl.h": "c",
+			"unistd.h": "c",
+			"system_config.h": "c"
+		},
+		"cmake.environment": {
+			"IDF_PATH": "~/esp/esp-idf"
+		},
+		"C_Cpp.default.includePath": [
+			"${default}"
+		],
+		"cmake.automaticReconfigure": false,
+		"cmake.configureOnEdit": false,
+		"cmake.configureOnOpen": false,
+		"cmake.enableAutomaticKitScan": false
+	}
+}
